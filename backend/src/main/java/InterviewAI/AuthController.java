@@ -108,7 +108,34 @@ public class AuthController {
                                 .body(Map.of("message", "User not found.")));
     }
 
-    public static class RegisterRequest {
+    
+    @DeleteMapping("/user")
+    public ResponseEntity<?> deleteUser(@RequestParam String email) {
+        String cleanEmail = email.trim().toLowerCase();
+        Optional<AppUser> user = userRepository.findByEmailIgnoreCase(cleanEmail);
+        if (user.isPresent()) {
+            userRepository.delete(user.get());
+            return ResponseEntity.ok(Map.of("message", "User " + cleanEmail + " deleted successfully."));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found."));
+    }
+
+    @PostMapping("/delete-user")
+    public ResponseEntity<?> deleteUserPost(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        if (email != null && !email.isBlank()) {
+            String cleanEmail = email.trim().toLowerCase();
+            Optional<AppUser> user = userRepository.findByEmailIgnoreCase(cleanEmail);
+            if (user.isPresent()) {
+                userRepository.delete(user.get());
+                return ResponseEntity.ok(Map.of("message", "User " + cleanEmail + " deleted successfully."));
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found."));
+        }
+        return ResponseEntity.badRequest().body(Map.of("message", "Email is required."));
+    }
+
+public static class RegisterRequest {
 
         @NotBlank
         @Size(max = 100)
