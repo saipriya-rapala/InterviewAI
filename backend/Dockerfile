@@ -14,15 +14,18 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Add non-root user for security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
+# Create non-root user and prepare directories with write permissions
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup -h /home/appuser -s /bin/sh -D && \
+    mkdir -p /app/data /app/private-resumes /home/appuser/.interviewai/resumes && \
+    chown -R appuser:appgroup /app /home/appuser
 
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build --chown=appuser:appgroup /app/target/*.jar app.jar
+
+USER appuser
 
 EXPOSE 8081
 
+ENV PORT=8081
 ENV SERVER_PORT=8081
-ENV SPRING_PROFILES_ACTIVE=prod
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

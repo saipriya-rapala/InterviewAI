@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import javax.sql.DataSource;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -30,10 +33,11 @@ public class DatabaseConfig {
     @Bean
     @Primary
     public DataSource dataSource() {
-        if (canConnectToPostgres(pgUrl, pgUsername, pgPassword)) {
-            log.info("Successfully connected to PostgreSQL at {}", pgUrl);
+        String formattedUrl = normalizeJdbcUrl(pgUrl);
+        if (canConnectToPostgres(formattedUrl, pgUsername, pgPassword)) {
+            log.info("Successfully connected to PostgreSQL at {}", formattedUrl);
             HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(pgUrl);
+            config.setJdbcUrl(formattedUrl);
             config.setUsername(pgUsername);
             config.setPassword(pgPassword);
             config.setDriverClassName("org.postgresql.Driver");
@@ -42,23 +46,52 @@ public class DatabaseConfig {
         }
 
         log.warn("=========================================================================================");
-        log.warn("POSTGRESQL UNAVAILABLE: Unable to connect to {} with user '{}'.", pgUrl, pgUsername);
-        log.warn("Falling back to local persistent storage at './data/interviewai'.");
-        log.warn("To use PostgreSQL, set DB_PASSWORD in 'backend/.env' (or $env:DB_PASSWORD) and restart.");
+        log.warn("POSTGRESQL UNAVAILABLE: Unable to connect to {} with user '{}'.", formattedUrl, pgUsername);
+        log.warn("Falling back to embedded H2 storage.");
         log.warn("=========================================================================================");
 
         HikariConfig h2Config = new HikariConfig();
-        h2Config.setJdbcUrl("jdbc:h2:file:./data/interviewai;MODE=PostgreSQL;AUTO_SERVER=TRUE");
         h2Config.setDriverClassName("org.h2.Driver");
         h2Config.setUsername("sa");
         h2Config.setPassword("");
         h2Config.setMaximumPoolSize(10);
+
+        boolean fileStorageReady = false;
+        try {
+            Files.createDirectories(Paths.get("./data"));
+            File testFile = new File("./data/.write-test");
+            if (testFile.createNewFile()) {
+                testFile.delete();
+                fileStorageReady = true;
+            }
+        } catch (Exception e) {
+            log.warn("File storage at ./data not writable ({}); falling back to in-memory DB.", e.getMessage());
+        }
+
+        if (fileStorageReady) {
+            h2Config.setJdbcUrl("jdbc:h2:file:./data/interviewai;MODE=PostgreSQL;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1");
+        } else {
+            h2Config.setJdbcUrl("jdbc:h2:mem:interviewaidb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false");
+        }
+
         return new HikariDataSource(h2Config);
+    }
+
+    private String normalizeJdbcUrl(String url) {
+        if (url == null) return null;
+        String trimmed = url.trim();
+        if (trimmed.startsWith("postgres://")) {
+            return "jdbc:postgresql://" + trimmed.substring("postgres://".length());
+        }
+        if (trimmed.startsWith("postgresql://")) {
+            return "jdbc:postgresql://" + trimmed.substring("postgresql://".length());
+        }
+        return trimmed;
     }
 
     private boolean canConnectToPostgres(String url, String username, String password) {
         if (password == null || password.isBlank()) {
-            log.warn("No DB_PASSWORD provided. PostgreSQL connection skipped.");
+            log.info("No DB_PASSWORD provided. PostgreSQL connection skipped.");
             return false;
         }
         try {
