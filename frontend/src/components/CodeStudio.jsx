@@ -1,3 +1,4 @@
+import CodeEditor, { highlightLine } from "./CodeEditor";
 import { useState, useMemo } from "react";
 import {
   Code2,
@@ -655,10 +656,15 @@ export default function CodeStudio() {
                   </div>
                 </div>
 
-                <div className={`p-4 rounded-2xl ${EDITOR_THEMES[editorTheme]?.bg || "bg-[#0d1117]"} font-mono text-xs ${EDITOR_THEMES[editorTheme]?.text || "text-sky-300"} overflow-x-auto max-h-[320px]`}>
-                  <pre className="whitespace-pre">
-                    {getLanguageCode(currentProblem, selectedLanguage, "solution")}
-                  </pre>
+                <div className={`p-4 rounded-2xl ${EDITOR_THEMES[editorTheme]?.bg || "bg-[#0d1117]"} font-mono text-xs overflow-x-auto max-h-[320px] leading-6`}>
+                  <code>
+                    {getLanguageCode(currentProblem, selectedLanguage, "solution").split("\n").map((line, idx) => (
+                      <div key={idx} className="h-6 leading-6">
+                        {highlightLine(line, selectedLanguage)}
+                        {line === "" && "\u00A0"}
+                      </div>
+                    ))}
+                  </code>
                 </div>
 
                 {/* Big-O breakdown */}
@@ -740,19 +746,20 @@ export default function CodeStudio() {
               </div>
             </div>
 
-            {/* Code Textarea Area with Dynamic Theme */}
-            <div className={`p-4 ${EDITOR_THEMES[editorTheme]?.bg || "bg-[#0d1117]"} font-mono text-xs sm:text-sm min-h-[380px] flex flex-col transition-colors duration-200`}>
-              <div className="text-[11px] text-slate-500 mb-2 font-mono select-none flex items-center justify-between">
-                <span>// Language: {selectedLanguage}. Type your solution below and click "Run Test Cases" to evaluate.</span>
+            {/* Syntax-Highlighted Code Editor with Distinct Comment Colors */}
+            <div className="flex flex-col">
+              <div className="px-4 py-2 bg-slate-950 font-mono text-[11px] text-slate-500 select-none flex items-center justify-between border-b border-slate-800">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span>// Language: {selectedLanguage}. Comments in green • Code in blue/white</span>
+                </span>
                 <span className="text-[10px] text-slate-500 uppercase font-mono tracking-wider">{EDITOR_THEMES[editorTheme]?.name}</span>
               </div>
-              <textarea
-                rows={16}
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                spellCheck={false}
-                placeholder="// Write your code here..."
-                className={`w-full flex-1 bg-transparent ${EDITOR_THEMES[editorTheme]?.text || "text-sky-300"} focus:outline-none leading-relaxed resize-y font-mono tracking-wide`}
+              <CodeEditor
+                code={code}
+                onChange={setCode}
+                language={selectedLanguage}
+                themeBg={EDITOR_THEMES[editorTheme]?.bg}
               />
             </div>
 
