@@ -1,5 +1,5 @@
-import CodeEditor, { highlightLine } from "./CodeEditor";
-import { useState, useMemo } from "react";
+import { highlightLine } from "./CodeEditor";
+import { useState, useMemo, useRef } from "react";
 import {
   Code2,
   Play,
@@ -22,8 +22,7 @@ import {
   BrainCircuit,
   Bookmark,
   BookmarkCheck,
-  BookOpen,
-  Palette
+  BookOpen
 } from "lucide-react";
 import TechnicalMcqStudio from "./TechnicalMcqStudio";
 import PlacementCheatSheets from "./PlacementCheatSheets";
@@ -41,15 +40,6 @@ import {
 
 const SUPPORTED_LANGUAGES = ["Python", "JavaScript", "Java", "C++", "C"];
 
-const EDITOR_THEMES = {
-  vscode: { name: "VS Code Blue", text: "text-sky-300", bg: "bg-[#0d1117]" },
-  github: { name: "GitHub Dark", text: "text-slate-100", bg: "bg-slate-950" },
-  dracula: { name: "Dracula Purple", text: "text-purple-300", bg: "bg-[#161324]" },
-  monokai: { name: "Monokai Amber", text: "text-amber-200", bg: "bg-[#1c1a17]" },
-  cyan: { name: "Cyan Ice", text: "text-cyan-300", bg: "bg-slate-950" },
-  matrix: { name: "Matrix Green", text: "text-emerald-400", bg: "bg-slate-950" },
-};
-
 export default function CodeStudio() {
   const [activeStudioTab, setActiveStudioTab] = useState("coding"); // "coding" | "mcq"
   const [selectedProblemId, setSelectedProblemId] = useState(DSA_PROBLEMS[0].id);
@@ -61,22 +51,30 @@ export default function CodeStudio() {
   const [copied, setCopied] = useState(false);
   const [copiedSolution, setCopiedSolution] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
-  const [editorTheme, setEditorTheme] = useState(() => {
-    try {
-      return localStorage.getItem("interviewai_code_theme") || "vscode";
-    } catch {
-      return "vscode";
-    }
-  });
 
-  function handleThemeChange(newTheme) {
-    setEditorTheme(newTheme);
-    try {
-      localStorage.setItem("interviewai_code_theme", newTheme);
-    } catch (e) {
-      console.error(e);
+  const gutterRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  const handleEditorScroll = (e) => {
+    if (gutterRef.current) {
+      gutterRef.current.scrollTop = e.target.scrollTop;
     }
-  }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const start = e.target.selectionStart;
+      const end = e.target.selectionEnd;
+      const updated = code.substring(0, start) + "    " + code.substring(end);
+      setCode(updated);
+      requestAnimationFrame(() => {
+        if (textareaRef.current) {
+          textareaRef.current.selectionStart = textareaRef.current.selectionEnd = start + 4;
+        }
+      });
+    }
+  };
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -656,7 +654,7 @@ export default function CodeStudio() {
                   </div>
                 </div>
 
-                <div className={`p-4 rounded-2xl ${EDITOR_THEMES[editorTheme]?.bg || "bg-[#0d1117]"} font-mono text-xs overflow-x-auto max-h-[320px] leading-6`}>
+                <div className="p-4 rounded-2xl bg-[#0d1117] border border-slate-800 font-mono text-xs overflow-x-auto max-h-[320px] leading-6">
                   <code>
                     {getLanguageCode(currentProblem, selectedLanguage, "solution").split("\n").map((line, idx) => (
                       <div key={idx} className="h-6 leading-6">
@@ -708,27 +706,11 @@ export default function CodeStudio() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-3 flex-wrap">
-                {/* Editor Color Theme Selector */}
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">
-                  <Palette className="w-3.5 h-3.5 text-indigo-500" />
-                  <select
-                    value={editorTheme}
-                    onChange={(e) => handleThemeChange(e.target.value)}
-                    className="bg-transparent text-[11px] font-semibold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
-                    title="Change Editor Code Theme"
-                  >
-                    {Object.entries(EDITOR_THEMES).map(([key, t]) => (
-                      <option key={key} value={key} className="bg-slate-900 text-slate-200">
-                        {t.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={handleCopyCode}
-                  className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white cursor-pointer shadow-xs transition-all"
                   title="Copy your code"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
@@ -737,7 +719,7 @@ export default function CodeStudio() {
                 <button
                   type="button"
                   onClick={handleResetCode}
-                  className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white cursor-pointer shadow-xs transition-all"
                   title="Reset code back to starter template"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
@@ -746,21 +728,42 @@ export default function CodeStudio() {
               </div>
             </div>
 
-            {/* Syntax-Highlighted Code Editor with Distinct Comment Colors */}
-            <div className="flex flex-col">
-              <div className="px-4 py-2 bg-slate-950 font-mono text-[11px] text-slate-500 select-none flex items-center justify-between border-b border-slate-800">
-                <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                  <span>// Language: {selectedLanguage}. Comments in green • Code in blue/white</span>
-                </span>
-                <span className="text-[10px] text-slate-500 uppercase font-mono tracking-wider">{EDITOR_THEMES[editorTheme]?.name}</span>
+            {/* Direct Native Code Editor */}
+            <div className="flex flex-col bg-[#0d1117] border-y border-slate-800">
+              <div className="px-4 py-2.5 bg-slate-950 font-mono text-xs select-none flex items-center justify-between border-b border-slate-800">
+                <div className="flex items-center gap-2 text-emerald-400 font-medium">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>// {selectedLanguage} Environment &bull; Type your code below</span>
+                </div>
+                <span className="text-[11px] text-slate-500 font-mono hidden sm:inline">Tab to indent</span>
               </div>
-              <CodeEditor
-                code={code}
-                onChange={setCode}
-                language={selectedLanguage}
-                themeBg={EDITOR_THEMES[editorTheme]?.bg}
-              />
+
+              <div className="flex min-h-[420px] max-h-[620px] overflow-hidden bg-[#0d1117]">
+                {/* Line Numbers Gutter */}
+                <div
+                  ref={gutterRef}
+                  aria-hidden="true"
+                  className="select-none py-4 px-3 text-right bg-[#090d13] border-r border-slate-800/80 font-mono text-xs leading-6 text-slate-600 shrink-0 overflow-hidden"
+                >
+                  {code.split("\n").map((_, idx) => (
+                    <div key={idx} className="h-6 leading-6">
+                      {idx + 1}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Direct Native Editable Textarea */}
+                <textarea
+                  ref={textareaRef}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onScroll={handleEditorScroll}
+                  spellCheck={false}
+                  placeholder="// Type your solution here..."
+                  className="w-full flex-1 p-4 bg-transparent text-sky-200 placeholder:text-slate-600 focus:outline-none font-mono text-xs sm:text-sm leading-6 whitespace-pre overflow-auto resize-y min-h-[380px] selection:bg-indigo-500/40"
+                />
+              </div>
             </div>
 
             {/* Action Buttons: Run Code & AI Complexity Critic */}
