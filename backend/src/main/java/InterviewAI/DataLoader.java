@@ -1,21 +1,35 @@
 package InterviewAI;
 
+import InterviewAI.entity.AppUser;
 import InterviewAI.entity.Question;
+import InterviewAI.repository.AppUserRepository;
 import InterviewAI.repository.QuestionRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DataLoader implements CommandLineRunner {
 
     private final QuestionRepository questionRepository;
+    private final AppUserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DataLoader(QuestionRepository questionRepository) {
+    public DataLoader(
+            QuestionRepository questionRepository,
+            AppUserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
         this.questionRepository = questionRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
+
+        // Automatically seed permanent accounts so they are never lost on server restarts or redeploys
+        seedUserIfNotExists("bunny@gmail.com", "Bunny", "bunny@123");
+        seedUserIfNotExists("abc@gmail.com", "ABC", "abcd@123");
 
         addQuestion("Java", "Easy", "What is Java?");
         addQuestion("Java", "Easy", "What is a class in Java?");
@@ -45,7 +59,14 @@ public class DataLoader implements CommandLineRunner {
             addQuestion(seed.language(), seed.difficulty(), seed.category(), seed.questionText());
         }
 
-        System.out.println("Interview questions checked and loaded!");
+        System.out.println("Interview questions and default accounts checked and loaded!");
+    }
+
+    private void seedUserIfNotExists(String email, String name, String rawPassword) {
+        if (!userRepository.existsByEmailIgnoreCase(email)) {
+            userRepository.save(new AppUser(name, email.toLowerCase(), passwordEncoder.encode(rawPassword)));
+            System.out.println("Seeded account: " + email);
+        }
     }
 
     private void addQuestion(String language, String difficulty, String questionText) {
