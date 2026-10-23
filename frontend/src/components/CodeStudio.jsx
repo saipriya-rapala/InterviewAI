@@ -1,5 +1,11 @@
-import { highlightLine } from "./CodeEditor";
-import { useState, useMemo, useRef } from "react";
+import Editor from "react-simple-code-editor";
+import Prism from "prismjs";
+import "prismjs/components/prism-c";
+import "prismjs/components/prism-cpp";
+import "prismjs/components/prism-python";
+import "prismjs/components/prism-java";
+import "prismjs/components/prism-javascript";
+import { useState, useMemo } from "react";
 import {
   Code2,
   Play,
@@ -40,6 +46,34 @@ import {
 
 const SUPPORTED_LANGUAGES = ["Python", "JavaScript", "Java", "C++", "C"];
 
+export function highlightCode(codeText, language) {
+  if (!codeText && codeText !== "") return "";
+  let grammar = Prism.languages.python;
+  let langKey = "python";
+
+  if (language === "JavaScript") {
+    grammar = Prism.languages.javascript;
+    langKey = "javascript";
+  } else if (language === "Java") {
+    grammar = Prism.languages.java;
+    langKey = "java";
+  } else if (language === "C++") {
+    grammar = Prism.languages.cpp;
+    langKey = "cpp";
+  } else if (language === "C") {
+    grammar = Prism.languages.c;
+    langKey = "c";
+  }
+
+  if (!grammar) return codeText;
+  try {
+    return Prism.highlight(codeText, grammar, langKey);
+  } catch (err) {
+    console.error("Prism highlight error:", err);
+    return codeText;
+  }
+}
+
 export default function CodeStudio() {
   const [activeStudioTab, setActiveStudioTab] = useState("coding"); // "coding" | "mcq"
   const [selectedProblemId, setSelectedProblemId] = useState(DSA_PROBLEMS[0].id);
@@ -51,30 +85,6 @@ export default function CodeStudio() {
   const [copied, setCopied] = useState(false);
   const [copiedSolution, setCopiedSolution] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
-
-  const gutterRef = useRef(null);
-  const textareaRef = useRef(null);
-
-  const handleEditorScroll = (e) => {
-    if (gutterRef.current) {
-      gutterRef.current.scrollTop = e.target.scrollTop;
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Tab") {
-      e.preventDefault();
-      const start = e.target.selectionStart;
-      const end = e.target.selectionEnd;
-      const updated = code.substring(0, start) + "    " + code.substring(end);
-      setCode(updated);
-      requestAnimationFrame(() => {
-        if (textareaRef.current) {
-          textareaRef.current.selectionStart = textareaRef.current.selectionEnd = start + 4;
-        }
-      });
-    }
-  };
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -654,15 +664,13 @@ export default function CodeStudio() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#0d1117] border border-slate-800 font-mono text-xs overflow-x-auto max-h-[320px] leading-6">
-                  <code>
-                    {getLanguageCode(currentProblem, selectedLanguage, "solution").split("\n").map((line, idx) => (
-                      <div key={idx} className="h-6 leading-6">
-                        {highlightLine(line, selectedLanguage)}
-                        {line === "" && "\u00A0"}
-                      </div>
-                    ))}
-                  </code>
+                <div className="rounded-2xl bg-[#0d1117] border border-slate-800 overflow-x-auto max-h-[320px]">
+                  <pre
+                    className="m-0 p-4 font-mono text-xs leading-6 code-studio-editor whitespace-pre"
+                    dangerouslySetInnerHTML={{
+                      __html: highlightCode(getLanguageCode(currentProblem, selectedLanguage, "solution"), selectedLanguage)
+                    }}
+                  />
                 </div>
 
                 {/* Big-O breakdown */}
@@ -728,22 +736,21 @@ export default function CodeStudio() {
               </div>
             </div>
 
-            {/* Direct Native Code Editor */}
+            {/* Syntax-Highlighted Real-Time Code Editor */}
             <div className="flex flex-col bg-[#0d1117] border-y border-slate-800">
               <div className="px-4 py-2.5 bg-slate-950 font-mono text-xs select-none flex items-center justify-between border-b border-slate-800">
                 <div className="flex items-center gap-2 text-emerald-400 font-medium">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>// {selectedLanguage} Environment &bull; Type your code below</span>
+                  <span>// {selectedLanguage} Environment &bull; Real-time Syntax Highlighting</span>
                 </div>
                 <span className="text-[11px] text-slate-500 font-mono hidden sm:inline">Tab to indent</span>
               </div>
 
-              <div className="flex min-h-[420px] max-h-[620px] overflow-hidden bg-[#0d1117]">
+              <div className="flex min-h-[420px] max-h-[620px] overflow-auto bg-[#0d1117]">
                 {/* Line Numbers Gutter */}
                 <div
-                  ref={gutterRef}
                   aria-hidden="true"
-                  className="select-none py-4 px-3 text-right bg-[#090d13] border-r border-slate-800/80 font-mono text-xs leading-6 text-slate-600 shrink-0 overflow-hidden"
+                  className="select-none py-4 px-3 text-right bg-[#090d13] border-r border-slate-800/80 font-mono text-xs leading-6 text-slate-600 shrink-0 sticky left-0 z-10"
                 >
                   {code.split("\n").map((_, idx) => (
                     <div key={idx} className="h-6 leading-6">
@@ -752,17 +759,26 @@ export default function CodeStudio() {
                   ))}
                 </div>
 
-                {/* Direct Native Editable Textarea */}
-                <textarea
-                  ref={textareaRef}
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  onScroll={handleEditorScroll}
-                  spellCheck={false}
-                  placeholder="// Type your solution here..."
-                  className="w-full flex-1 p-4 bg-transparent text-sky-200 placeholder:text-slate-600 focus:outline-none font-mono text-xs sm:text-sm leading-6 whitespace-pre overflow-auto resize-y min-h-[380px] selection:bg-indigo-500/40"
-                />
+                {/* React Simple Code Editor with Real-Time Syntax Highlighting */}
+                <div className="flex-1 min-w-[500px]">
+                  <Editor
+                    value={code}
+                    onValueChange={setCode}
+                    highlight={(c) => highlightCode(c, selectedLanguage)}
+                    padding={16}
+                    tabSize={4}
+                    insertSpaces={true}
+                    className="code-studio-editor"
+                    placeholder="// Type your solution here..."
+                    style={{
+                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                      fontSize: "13px",
+                      lineHeight: "24px",
+                      minHeight: "380px",
+                      backgroundColor: "transparent",
+                    }}
+                  />
+                </div>
               </div>
             </div>
 

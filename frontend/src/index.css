@@ -129,3 +129,93 @@ body {
     box-shadow: none !important;
   }
 }
+
+/* ==========================================================================
+   Code Studio Syntax Highlighting (Exact LeetCode & VS Code Dark+ Styling)
+   ========================================================================== */
+.code-studio-editor {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  font-size: 13px !important;
+  line-height: 24px !important;
+  background-color: transparent !important;
+  color: #f0f6fc !important;
+}
+
+.code-studio-editor pre,
+.code-studio-editor textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  font-size: 13px !important;
+  line-height: 24px !important;
+  white-space: pre !important;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
+.code-studio-editor textarea {
+  outline: none !important;
+  caret-color: #ffffff !important;
+}
+
+.code-studio-editor textarea::selection {
+  background: rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Comments: distinct muted grey/green italic (matches user's Image 2) */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #8b949e !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+}
+
+/* Keywords: red/coral (class, def, for, in, if, return, else, while, import, pass, etc.) */
+.token.keyword,
+.token.tag,
+.token.boolean {
+  color: #ff7b72 !important;
+  font-weight: 600 !important;
+}
+
+/* Functions & Methods: bright sky blue (twoSum, enumerate, print, etc.) */
+.token.function,
+.token.function-variable {
+  color: #79c0ff !important;
+  font-weight: 500 !important;
+}
+
+/* Builtins, Classes, Types: warm amber / light orange (Solution, list, int, str, dict, etc.) */
+.token.class-name,
+.token.builtin {
+  color: #ffa657 !important;
+  font-weight: 500 !important;
+}
+
+/* Strings: soft sky blue / amber */
+.token.string,
+.token.char {
+  color: #a5d6ff !important;
+}
+
+/* Numbers: bright cyan */
+.token.number {
+  color: #79c0ff !important;
+}
+
+/* Operators: red/coral (=, ->, +, -, *, /, ==, !=) */
+.token.operator {
+  color: #ff7b72 !important;
+}
+
+/* Punctuation & Brackets: clean light slate (:, {, }, [, ], (, ), comma) */
+.token.punctuation {
+  color: #c9d1d9 !important;
+}
+
+/* Variables & Parameters: crisp white/slate */
+.token.parameter,
+.token.variable {
+  color: #f0f6fc !important;
+}
+
