@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:8081";
+import API from "./apiConfig";
 const CATEGORIES = [
   "Resume and introduction",
   "HR and behavioral",

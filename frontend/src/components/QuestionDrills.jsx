@@ -22,7 +22,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:8081";
+import API from "../apiConfig";
 
 const TOPICS = [
   { id: "All", label: "All Topics", icon: Layers },

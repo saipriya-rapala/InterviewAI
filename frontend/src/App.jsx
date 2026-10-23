@@ -23,7 +23,7 @@ import {
   X,
 } from "lucide-react";
 
-const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:8081";
+import API from "./apiConfig";
 
 async function readResponse(response) {
   const text = await response.text();

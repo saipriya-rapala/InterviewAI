@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import ReadinessReportModal from "./ReadinessReportModal";
 
-const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:8081";
+import API from "../apiConfig";
 
 async function readResponse(res) {
   const text = await res.text();

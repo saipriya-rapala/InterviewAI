@@ -37,7 +37,7 @@ import {
   extractDeepResumeInventory,
 } from "../utils/conversationalEngine";
 
-const API = import.meta.env.VITE_API_BASE_URL || "http://localhost:8081";
+import API from "../apiConfig";
 
 function getCachedProfile() {
   try {

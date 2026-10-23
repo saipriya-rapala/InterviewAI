@@ -2,7 +2,7 @@ services:
   # Spring Boot Backend Web Service
   - type: web
     name: interviewai-backend
-    runtime: image
+    runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     plan: free
@@ -12,6 +12,8 @@ services:
         sync: false
       - key: JWT_SECRET
         generateValue: true
+      - key: PORT
+        value: 8081
       - key: SERVER_PORT
         value: 8081
 
@@ -22,7 +24,6 @@ services:
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
     plan: free
-    region: oregon
     routes:
       - type: rewrite
         source: /*

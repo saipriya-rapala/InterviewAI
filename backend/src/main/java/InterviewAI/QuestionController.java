@@ -14,11 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = {
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:5175"
-})
+@CrossOrigin(originPatterns = {"http://localhost:*", "https://*.onrender.com"})
 public class QuestionController {
 
     private final QuestionRepository questionRepository;

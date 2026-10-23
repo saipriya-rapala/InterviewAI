@@ -19,11 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/answers")
-@CrossOrigin(origins = {
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:5175"
-})
+@CrossOrigin(originPatterns = {"http://localhost:*", "https://*.onrender.com"})
 public class AnswerController {
 
     private final InterviewAnswerRepository answerRepository;

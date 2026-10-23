@@ -28,11 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/profile")
-@CrossOrigin(origins = {
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175"
-})
+@CrossOrigin(originPatterns = {"http://localhost:*", "https://*.onrender.com"})
 public class ProfileController {
 
     private final AppUserRepository userRepository;
