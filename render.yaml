@@ -29,7 +29,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: interviewai-backend
-          property: host
+        value: https://interviewai-backend-jywj.onrender.com
