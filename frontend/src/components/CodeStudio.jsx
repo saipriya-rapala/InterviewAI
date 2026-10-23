@@ -21,7 +21,8 @@ import {
   BrainCircuit,
   Bookmark,
   BookmarkCheck,
-  BookOpen
+  BookOpen,
+  Palette
 } from "lucide-react";
 import TechnicalMcqStudio from "./TechnicalMcqStudio";
 import PlacementCheatSheets from "./PlacementCheatSheets";
@@ -39,6 +40,15 @@ import {
 
 const SUPPORTED_LANGUAGES = ["Python", "JavaScript", "Java", "C++", "C"];
 
+const EDITOR_THEMES = {
+  vscode: { name: "VS Code Blue", text: "text-sky-300", bg: "bg-[#0d1117]" },
+  github: { name: "GitHub Dark", text: "text-slate-100", bg: "bg-slate-950" },
+  dracula: { name: "Dracula Purple", text: "text-purple-300", bg: "bg-[#161324]" },
+  monokai: { name: "Monokai Amber", text: "text-amber-200", bg: "bg-[#1c1a17]" },
+  cyan: { name: "Cyan Ice", text: "text-cyan-300", bg: "bg-slate-950" },
+  matrix: { name: "Matrix Green", text: "text-emerald-400", bg: "bg-slate-950" },
+};
+
 export default function CodeStudio() {
   const [activeStudioTab, setActiveStudioTab] = useState("coding"); // "coding" | "mcq"
   const [selectedProblemId, setSelectedProblemId] = useState(DSA_PROBLEMS[0].id);
@@ -50,6 +60,22 @@ export default function CodeStudio() {
   const [copied, setCopied] = useState(false);
   const [copiedSolution, setCopiedSolution] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
+  const [editorTheme, setEditorTheme] = useState(() => {
+    try {
+      return localStorage.getItem("interviewai_code_theme") || "vscode";
+    } catch {
+      return "vscode";
+    }
+  });
+
+  function handleThemeChange(newTheme) {
+    setEditorTheme(newTheme);
+    try {
+      localStorage.setItem("interviewai_code_theme", newTheme);
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -629,7 +655,7 @@ export default function CodeStudio() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-950 font-mono text-xs text-emerald-400 overflow-x-auto max-h-[320px]">
+                <div className={`p-4 rounded-2xl ${EDITOR_THEMES[editorTheme]?.bg || "bg-[#0d1117]"} font-mono text-xs ${EDITOR_THEMES[editorTheme]?.text || "text-sky-300"} overflow-x-auto max-h-[320px]`}>
                   <pre className="whitespace-pre">
                     {getLanguageCode(currentProblem, selectedLanguage, "solution")}
                   </pre>
@@ -676,7 +702,23 @@ export default function CodeStudio() {
                 ))}
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* Editor Color Theme Selector */}
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">
+                  <Palette className="w-3.5 h-3.5 text-indigo-500" />
+                  <select
+                    value={editorTheme}
+                    onChange={(e) => handleThemeChange(e.target.value)}
+                    className="bg-transparent text-[11px] font-semibold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer"
+                    title="Change Editor Code Theme"
+                  >
+                    {Object.entries(EDITOR_THEMES).map(([key, t]) => (
+                      <option key={key} value={key} className="bg-slate-900 text-slate-200">
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <button
                   type="button"
                   onClick={handleCopyCode}
@@ -698,10 +740,11 @@ export default function CodeStudio() {
               </div>
             </div>
 
-            {/* Code Textarea Area */}
-            <div className="p-4 bg-slate-950 font-mono text-xs sm:text-sm text-slate-100 min-h-[380px] flex flex-col">
-              <div className="text-[11px] text-slate-500 mb-2 font-mono select-none">
-                // Language: {selectedLanguage}. Type your solution below and click "Run Test Cases" to evaluate.
+            {/* Code Textarea Area with Dynamic Theme */}
+            <div className={`p-4 ${EDITOR_THEMES[editorTheme]?.bg || "bg-[#0d1117]"} font-mono text-xs sm:text-sm min-h-[380px] flex flex-col transition-colors duration-200`}>
+              <div className="text-[11px] text-slate-500 mb-2 font-mono select-none flex items-center justify-between">
+                <span>// Language: {selectedLanguage}. Type your solution below and click "Run Test Cases" to evaluate.</span>
+                <span className="text-[10px] text-slate-500 uppercase font-mono tracking-wider">{EDITOR_THEMES[editorTheme]?.name}</span>
               </div>
               <textarea
                 rows={16}
@@ -709,7 +752,7 @@ export default function CodeStudio() {
                 onChange={(e) => setCode(e.target.value)}
                 spellCheck={false}
                 placeholder="// Write your code here..."
-                className="w-full flex-1 bg-transparent text-emerald-400 focus:outline-none leading-relaxed resize-y font-mono"
+                className={`w-full flex-1 bg-transparent ${EDITOR_THEMES[editorTheme]?.text || "text-sky-300"} focus:outline-none leading-relaxed resize-y font-mono tracking-wide`}
               />
             </div>
 
