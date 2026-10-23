@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+/* Audio wave animation */
+@keyframes soundwave {
+  0%, 100% {
+    height: 6px;
+  }
+  50% {
+    height: 32px;
+  }
+}
+
+.wave-bar {
+  display: inline-block;
+  width: 4px;
+  border-radius: 9999px;
+  background: linear-gradient(to top, #6366f1, #a855f7);
+  animation: soundwave 1.2s ease-in-out infinite;
+}
+
+.wave-bar:nth-child(2) { animation-delay: 0.15s; }
+.wave-bar:nth-child(3) { animation-delay: 0.3s; }
+.wave-bar:nth-child(4) { animation-delay: 0.45s; }
+.wave-bar:nth-child(5) { animation-delay: 0.6s; }
+.wave-bar:nth-child(6) { animation-delay: 0.75s; }
+.wave-bar:nth-child(7) { animation-delay: 0.9s; }
+
+/* Mini pulsating audio soundbar next to recording button */
+@keyframes soundbar-pulse {
+  0%, 100% {
+    height: 4px;
+    opacity: 0.5;
+  }
+  50% {
+    height: 18px;
+    opacity: 1;
+  }
+}
+
+.mini-soundbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5px;
+  height: 20px;
+}
+
+.mini-soundbar-bar {
+  display: inline-block;
+  width: 3px;
+  border-radius: 9999px;
+  background-color: currentColor;
+  animation: soundbar-pulse 0.9s ease-in-out infinite;
+}
+
+.mini-soundbar-bar:nth-child(1) { animation-delay: 0.05s; }
+.mini-soundbar-bar:nth-child(2) { animation-delay: 0.25s; }
+.mini-soundbar-bar:nth-child(3) { animation-delay: 0.45s; }
+.mini-soundbar-bar:nth-child(4) { animation-delay: 0.15s; }
+.mini-soundbar-bar:nth-child(5) { animation-delay: 0.35s; }
+
+/* Print optimization for PDF Scorecard Export */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide navigation, buttons, and studio chrome when printing PDF */
+  header, nav, button, .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+  }
+}

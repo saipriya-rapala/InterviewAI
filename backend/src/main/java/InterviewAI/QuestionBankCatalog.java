@@ -1,0 +1,106 @@
+package InterviewAI;
+
+import java.util.List;
+
+public final class QuestionBankCatalog {
+
+    private static final List<Seed> QUESTIONS = List.of(
+            new Seed("Java", "Medium", "Language fundamentals", "How does method overloading differ from method overriding in Java?"),
+            new Seed("Python", "Medium", "Language fundamentals", "How do iterators and generators differ in Python?"),
+            new Seed("SQL", "Medium", "Database and SQL", "When would you use an INNER JOIN instead of a LEFT JOIN?"),
+            new Seed("JavaScript", "Easy", "Language fundamentals", "What is the difference between let, const, and var in JavaScript?"),
+            new Seed("JavaScript", "Medium", "Language fundamentals", "How do promises and async/await handle asynchronous work in JavaScript?"),
+            new Seed("JavaScript", "Hard", "Language fundamentals", "Explain the JavaScript event loop and how microtasks differ from tasks."),
+            new Seed("TypeScript", "Easy", "Language fundamentals", "What is the difference between a type alias and an interface in TypeScript?"),
+            new Seed("TypeScript", "Medium", "Language fundamentals", "How do generics improve type safety in TypeScript?"),
+            new Seed("TypeScript", "Hard", "Language fundamentals", "How does TypeScript's structural type system affect compatibility and narrowing?"),
+            new Seed("C", "Easy", "Language fundamentals", "What is a pointer in C and how is it declared?"),
+            new Seed("C", "Medium", "Language fundamentals", "How do malloc and free manage dynamically allocated memory in C?"),
+            new Seed("C", "Hard", "Language fundamentals", "What causes undefined behavior in C, and how can buffer overflows be prevented?"),
+            new Seed("C++", "Easy", "Language fundamentals", "What is a constructor in C++ and when is it called?"),
+            new Seed("C++", "Medium", "Language fundamentals", "How does RAII manage resource lifetime in C++?"),
+            new Seed("C++", "Hard", "Language fundamentals", "Explain move semantics and how std::move affects object ownership in C++."),
+            new Seed("C#", "Easy", "Language fundamentals", "What is the difference between a value type and a reference type in C#?"),
+            new Seed("C#", "Medium", "Language fundamentals", "How do async and await work with Tasks in C#?"),
+            new Seed("C#", "Hard", "Language fundamentals", "How can synchronization-context deadlocks occur in asynchronous C# code?"),
+            new Seed("Go", "Easy", "Language fundamentals", "What is the difference between an array and a slice in Go?"),
+            new Seed("Go", "Medium", "Language fundamentals", "How do goroutines communicate using channels in Go?"),
+            new Seed("Go", "Hard", "Language fundamentals", "How would you prevent goroutine leaks and coordinate cancellation in Go?"),
+            new Seed("Rust", "Easy", "Language fundamentals", "What are ownership and borrowing in Rust?"),
+            new Seed("Rust", "Medium", "Language fundamentals", "How do Rust lifetimes ensure references remain valid?"),
+            new Seed("Rust", "Hard", "Language fundamentals", "How does Rust's type system prevent data races in safe concurrent code?"),
+            new Seed("PHP", "Easy", "Language fundamentals", "How are associative arrays used in PHP?"),
+            new Seed("PHP", "Medium", "Language fundamentals", "How do sessions and cookies differ in a PHP web application?"),
+            new Seed("PHP", "Hard", "Language fundamentals", "How would you prevent SQL injection and cross-site scripting in PHP?"),
+            new Seed("Ruby", "Easy", "Language fundamentals", "What is a block in Ruby and how is it passed to a method?"),
+            new Seed("Ruby", "Medium", "Language fundamentals", "How do modules provide mixins and namespacing in Ruby?"),
+            new Seed("Ruby", "Hard", "Language fundamentals", "How does Ruby's garbage collection manage object memory?"),
+            new Seed("Kotlin", "Easy", "Language fundamentals", "How does Kotlin's nullable type system help prevent null pointer errors?"),
+            new Seed("Kotlin", "Medium", "Language fundamentals", "What are coroutines in Kotlin and how do they suspend without blocking?"),
+            new Seed("Kotlin", "Hard", "Language fundamentals", "How do structured concurrency and coroutine cancellation work in Kotlin?"),
+            new Seed("Swift", "Easy", "Language fundamentals", "What is the difference between a struct and a class in Swift?"),
+            new Seed("Swift", "Medium", "Language fundamentals", "How does optional binding unwrap an optional safely in Swift?"),
+            new Seed("Swift", "Hard", "Language fundamentals", "How do actors help isolate mutable state in concurrent Swift code?"),
+            new Seed("R", "Easy", "Language fundamentals", "What is a data frame in R and how is it different from a vector?"),
+            new Seed("R", "Medium", "Language fundamentals", "How do factors represent categorical data in R?"),
+            new Seed("R", "Hard", "Language fundamentals", "How would you vectorize an operation in R and why can that improve performance?"),
+            new Seed("Dart", "Easy", "Language fundamentals", "What is null safety in Dart?"),
+            new Seed("Dart", "Medium", "Language fundamentals", "How do Future and Stream differ in Dart?"),
+            new Seed("Dart", "Hard", "Language fundamentals", "How do isolates perform concurrent work without sharing mutable memory in Dart?"),
+            new Seed("Scala", "Easy", "Language fundamentals", "What is a case class in Scala?"),
+            new Seed("Scala", "Medium", "Language fundamentals", "How do immutable collections support functional programming in Scala?"),
+            new Seed("Scala", "Hard", "Language fundamentals", "How do Scala Futures represent asynchronous computations and failures?"),
+            new Seed("Bash", "Easy", "Language fundamentals", "How do you store and expand a variable safely in Bash?"),
+            new Seed("Bash", "Medium", "Language fundamentals", "How do pipelines and exit statuses work in Bash?"),
+            new Seed("Bash", "Hard", "Language fundamentals", "How do traps and strict-mode options help make Bash scripts safer?"),
+            new Seed("Java", "Easy", "Language fundamentals", "What is the difference between primitive and reference types in Java?"),
+            new Seed("Java", "Hard", "Language fundamentals", "How do Java locks and the happens-before relationship help make concurrent code safe?"),
+            new Seed("Python", "Easy", "Language fundamentals", "What is the difference between a mutable and immutable object in Python?"),
+            new Seed("Python", "Hard", "Language fundamentals", "How does the Global Interpreter Lock affect CPU-bound threads in CPython?"),
+            new Seed("SQL", "Easy", "Database and SQL", "What is the difference between a primary key and a foreign key?"),
+            new Seed("SQL", "Hard", "Database and SQL", "How does a window function differ from a GROUP BY aggregate in SQL?"),
+            new Seed("React", "Easy", "Frameworks and tools", "What is the difference between props and state in React?"),
+            new Seed("React", "Medium", "Frameworks and tools", "How do React effects synchronize a component with an external system?"),
+            new Seed("React", "Hard", "Frameworks and tools", "How would you diagnose and reduce unnecessary React renders?"),
+            new Seed("Spring Boot", "Easy", "Frameworks and tools", "What does dependency injection provide in a Spring Boot application?"),
+            new Seed("Spring Boot", "Medium", "Frameworks and tools", "How would you structure validation and error handling for a Spring Boot REST API?"),
+            new Seed("Spring Boot", "Hard", "Frameworks and tools", "How would you secure a stateless Spring Boot API with JWT and test its authorization boundaries?"),
+            new Seed("Node.js", "Easy", "Frameworks and tools", "What is the Node.js event loop used for?"),
+            new Seed("Node.js", "Medium", "Frameworks and tools", "How should a Node.js service handle asynchronous errors and request timeouts?"),
+            new Seed("Node.js", "Hard", "Frameworks and tools", "How would you diagnose event-loop blocking in a high-throughput Node.js service?"),
+            new Seed("Express", "Easy", "Frameworks and tools", "What is Express middleware and how is it applied to a route?"),
+            new Seed("Express", "Medium", "Frameworks and tools", "How do you centralize error handling and request validation in Express?"),
+            new Seed("Express", "Hard", "Frameworks and tools", "How would you organize authentication, authorization, and rate limiting in an Express API?"),
+            new Seed("PostgreSQL", "Easy", "Database and SQL", "What is an index in PostgreSQL and what is its basic trade-off?"),
+            new Seed("PostgreSQL", "Medium", "Database and SQL", "How do transactions and isolation levels protect PostgreSQL data?"),
+            new Seed("PostgreSQL", "Hard", "Database and SQL", "How would you investigate and improve a slow PostgreSQL query using an execution plan?"),
+            new Seed("MySQL", "Easy", "Database and SQL", "What is a transaction in MySQL?"),
+            new Seed("MySQL", "Medium", "Database and SQL", "How do indexes affect MySQL reads and writes?"),
+            new Seed("MySQL", "Hard", "Database and SQL", "How would you reason about InnoDB locking and transaction isolation during a deadlock?"),
+            new Seed("MongoDB", "Easy", "Database and SQL", "How does MongoDB store documents in a collection?"),
+            new Seed("MongoDB", "Medium", "Database and SQL", "How do you choose between embedding and referencing documents in MongoDB?"),
+            new Seed("MongoDB", "Hard", "Database and SQL", "How would you design a MongoDB aggregation pipeline for a paginated analytics query?"),
+            new Seed("Docker", "Easy", "Frameworks and tools", "What is the difference between a Docker image and a container?"),
+            new Seed("Docker", "Medium", "Frameworks and tools", "How do multi-stage Docker builds reduce production image size?"),
+            new Seed("Docker", "Hard", "Frameworks and tools", "How would you reduce container attack surface and manage runtime secrets safely?"),
+            new Seed("Kubernetes", "Easy", "Frameworks and tools", "What is the role of a Kubernetes pod?"),
+            new Seed("Kubernetes", "Medium", "Frameworks and tools", "How do Kubernetes Deployments and Services work together?"),
+            new Seed("Kubernetes", "Hard", "Frameworks and tools", "How would you diagnose repeated pod restarts and protect a rolling deployment?"),
+            new Seed("Apache Spark", "Easy", "Frameworks and tools", "What is the difference between a Spark transformation and an action?"),
+            new Seed("Apache Spark", "Medium", "Frameworks and tools", "How does partitioning affect a Spark job?"),
+            new Seed("Apache Spark", "Hard", "Frameworks and tools", "How would you diagnose and reduce a Spark shuffle bottleneck?"),
+            new Seed("Kafka", "Easy", "Frameworks and tools", "What are Kafka topics and partitions?"),
+            new Seed("Kafka", "Medium", "Frameworks and tools", "How do Kafka consumer groups distribute partitions?"),
+            new Seed("Kafka", "Hard", "Frameworks and tools", "How do delivery guarantees and offset commits affect Kafka message processing?")
+    );
+
+    private QuestionBankCatalog() {
+    }
+
+    public static List<Seed> questions() {
+        return QUESTIONS;
+    }
+
+    public record Seed(String language, String difficulty, String category, String questionText) {
+    }
+}
