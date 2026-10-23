@@ -135,6 +135,21 @@ public class AuthController {
         return ResponseEntity.badRequest().body(Map.of("message", "Email is required."));
     }
 
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody LoginRequest request) {
+        String email = request.getEmail().trim().toLowerCase();
+        Optional<AppUser> optionalUser = userRepository.findByEmailIgnoreCase(email);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "No account found with this email."));
+        }
+        AppUser user = optionalUser.get();
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok(Map.of("message", "Password reset successfully! Please sign in."));
+    }
+
 public static class RegisterRequest {
 
         @NotBlank
