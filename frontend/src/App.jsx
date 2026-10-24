@@ -66,11 +66,16 @@ export default function App() {
         const response = await fetch(`${API}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (response.status === 401 || response.status === 403) {
+          if (active) logout();
+          return;
+        }
         const data = await readResponse(response);
         if (!response.ok) throw new Error(data.message || "Session expired.");
         if (active) setUser({ name: data.name, email: data.email });
-      } catch {
-        if (active) logout();
+      } catch (err) {
+        // Do not force logout on temporary cold-start network issues
+        console.warn("Session restore attempt deferred:", err?.message || err);
       }
     }
 
