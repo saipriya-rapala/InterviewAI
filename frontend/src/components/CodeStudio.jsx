@@ -3,11 +3,18 @@ import SimpleEditor from "react-simple-code-editor";
 // Support both ESM and CJS bundling where default might be wrapped
 const Editor = (() => {
   let comp = SimpleEditor;
-  if (comp && comp.default) {
+  while (comp && comp.default && typeof comp !== "function" && !comp.$$typeof) {
+    comp = comp.default;
+  }
+  if (comp && comp.default && (typeof comp.default === "function" || comp.default.$$typeof)) {
     comp = comp.default;
   }
   return comp;
 })();
+
+const isEditorValid = Boolean(
+  typeof Editor === "function" || (Editor && typeof Editor === "object" && Editor.$$typeof)
+);
 import Prism from "prismjs";
 import "prismjs/components/prism-c";
 import "prismjs/components/prism-cpp";
@@ -770,23 +777,33 @@ export default function CodeStudio() {
 
                 {/* React Simple Code Editor with Real-Time Syntax Highlighting */}
                 <div className="flex-1 min-w-[500px]">
-                  <Editor
-                    value={code}
-                    onValueChange={setCode}
-                    highlight={(c) => highlightCode(c, selectedLanguage)}
-                    padding={16}
-                    tabSize={4}
-                    insertSpaces={true}
-                    className="code-studio-editor"
-                    placeholder="// Type your solution here..."
-                    style={{
-                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                      fontSize: "13px",
-                      lineHeight: "24px",
-                      minHeight: "380px",
-                      backgroundColor: "transparent",
-                    }}
-                  />
+                  {isEditorValid ? (
+                    <Editor
+                      value={code}
+                      onValueChange={setCode}
+                      highlight={(c) => highlightCode(c, selectedLanguage)}
+                      padding={16}
+                      tabSize={4}
+                      insertSpaces={true}
+                      className="code-studio-editor"
+                      placeholder="// Type your solution here..."
+                      style={{
+                        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                        fontSize: "13px",
+                        lineHeight: "24px",
+                        minHeight: "380px",
+                        backgroundColor: "transparent",
+                      }}
+                    />
+                  ) : (
+                    <textarea
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      spellCheck={false}
+                      placeholder="// Type your solution here..."
+                      className="w-full h-full p-4 bg-transparent text-sky-200 placeholder:text-slate-600 focus:outline-none font-mono text-xs sm:text-sm leading-6 whitespace-pre overflow-auto resize-y min-h-[380px] selection:bg-indigo-500/40"
+                    />
+                  )}
                 </div>
               </div>
             </div>
