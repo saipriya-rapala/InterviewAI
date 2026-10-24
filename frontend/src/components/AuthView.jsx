@@ -343,45 +343,6 @@ export default function AuthView({ onAuthSuccess, apiBaseUrl }) {
               </p>
             </div>
 
-            {/* Quick Demo Credentials Pill (Login mode only) */}
-            {mode === "login" && (
-              <div className="p-3 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 text-xs mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                    Demo Credentials (1-Click)
-                  </span>
-                  <span className="text-[10px] font-mono text-indigo-600 dark:text-indigo-400">Preloaded</span>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail("bunny@gmail.com");
-                      setPassword("bunny@123");
-                      setMessage({ text: "", type: "" });
-                    }}
-                    className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-indigo-200/80 dark:border-indigo-800 text-slate-800 dark:text-slate-200 hover:border-indigo-500 transition-colors font-medium flex items-center gap-1.5 cursor-pointer text-[11px] shadow-xs"
-                  >
-                    <span>👤 Bunny:</span>
-                    <span className="font-mono text-indigo-600 dark:text-indigo-400">bunny@123</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail("abc@gmail.com");
-                      setPassword("abcd@123");
-                      setMessage({ text: "", type: "" });
-                    }}
-                    className="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-indigo-500 transition-colors font-medium flex items-center gap-1.5 cursor-pointer text-[11px] shadow-xs"
-                  >
-                    <span>👤 ABC:</span>
-                    <span className="font-mono text-indigo-600 dark:text-indigo-400">abcd@123</span>
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Social OAuth Buttons */}
             {mode !== "forgot" && (
               <div className="grid grid-cols-2 gap-3 mb-6">
