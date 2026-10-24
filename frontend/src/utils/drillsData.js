@@ -1257,7 +1257,7 @@ export function generateDynamicDrill(language = "Java", topic = "Backend", round
   } else if (architectureQ && seed % 4 === 0) {
     questionText = architectureQ;
   } else {
-    questionText = `In ${scenario.context} built with **${language}**, handling **${scenario.scale}** with **${scenario.latency}**: Suppose the system encounters **${scenario.failure}**.\n\nWalk me through your engineering diagnosis: How does **${mechanics}** influence this bottleneck, what low-level telemetry would you inspect, and what concrete architectural or code-level changes would you implement to guarantee resilience?`;
+    questionText = `In a ${scenario.context} built with ${language}: Suppose the system encounters ${scenario.failure}. How would you diagnose the root cause and resolve it?`;
   }
 
   const modelAnswer = isHighFrequency

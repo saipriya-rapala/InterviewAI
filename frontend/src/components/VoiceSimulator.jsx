@@ -28,6 +28,7 @@ import {
 import InterviewReportModal from "./InterviewReportModal";
 import {
   SUPPORTED_LANGUAGES,
+  cleanAsterisks,
   buildContinuousCompetencyQueue,
   generateConversationalOpening,
   generateDynamicQuestion,
@@ -345,7 +346,7 @@ export default function VoiceSimulator({
         const switchMessage = {
           id: `ai-lang-switch-${Date.now()}`,
           role: "ai",
-          text: `Target language stack updated to **${updated.join(", ")}** for **${roundLabel}**.\n\n${nextQ}`,
+          text: cleanAsterisks(`Target language stack updated to ${updated.join(", ")} for ${roundLabel}.\n\n${nextQ}`),
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           topicLabel: newComps[0]?.label || "Language Focus",
           probed: false,
@@ -382,7 +383,7 @@ export default function VoiceSimulator({
       const switchMessage = {
         id: `ai-round-switch-${Date.now()}`,
         role: "ai",
-        text: `Switched interview format to **${roundName}** for **${selectedLanguages.join(", ")}**.\n\n${nextQ}`,
+        text: cleanAsterisks(`Switched interview format to ${roundName} for ${selectedLanguages.join(", ")}.\n\n${nextQ}`),
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         topicLabel: newComps[0]?.label || "Round Focus",
         probed: false,
@@ -416,9 +417,11 @@ export default function VoiceSimulator({
         { selectedLanguages, roundType }
       );
 
-      const transitionText = targetComp.covered
-        ? `Revisiting **${targetComp.label}** with a deeper scenario:\n\n${newQuestion}`
-        : `Switching focus to **${targetComp.label}**:\n\n${newQuestion}`;
+      const transitionText = cleanAsterisks(
+        targetComp.covered
+          ? `Revisiting ${targetComp.label}:\n\n${newQuestion}`
+          : `Let's focus on ${targetComp.label}:\n\n${newQuestion}`
+      );
 
       const aiMessage = {
         id: `ai-jump-${Date.now()}`,
@@ -556,7 +559,7 @@ export default function VoiceSimulator({
       );
 
       const ackPhrase = evaluation.acknowledgment || "Great breakdown.";
-      aiReplyText = `${ackPhrase}\n\nMoving forward to **${targetComp.label}**:\n${nextQuestion}`;
+      aiReplyText = cleanAsterisks(`${ackPhrase}\n\nNext question on ${targetComp.label}:\n\n${nextQuestion}`);
     }
 
     const aiMessage = {
@@ -910,7 +913,7 @@ export default function VoiceSimulator({
                           : "bg-indigo-600 text-white font-mono"
                       }`}
                     >
-                      {msg.text}
+                      {cleanAsterisks(msg.text)}
                     </div>
 
                     {isAi && (

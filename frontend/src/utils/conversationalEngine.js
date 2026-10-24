@@ -16,6 +16,15 @@
  * 5. On-Demand Elite Model Answers for the comprehensive scorecard.
  */
 
+export function cleanAsterisks(text) {
+  if (!text) return "";
+  return text
+    .replace(/\*\*([^\*]+)\*\*/g, (m, p1) => p1)
+    .replace(/\*([^\*]+)\*/g, (m, p1) => p1)
+    .replace(/\*/g, "")
+    .trim();
+}
+
 export const SUPPORTED_LANGUAGES = [
   "Java",
   "Python",
@@ -51,12 +60,12 @@ export const LANGUAGE_TR_KNOWLEDGE = {
   Java: {
     name: "Java / Spring Boot",
     mostlyExpectedInterviewQuestions: [
-      "Why is `String` immutable in Java, and how does the String Constant Pool optimize memory? What are the key differences between `String`, `StringBuilder`, and `StringBuffer` in multi-threaded contexts?",
-      "Explain the contract between `equals()` and `hashCode()` in Java. What happens if you override `equals()` without overriding `hashCode()` when using a `HashMap` or `HashSet`?",
-      "How does `HashMap` work internally in Java 8+? Walk me through hashing, bucket index calculation, collision resolution, and why/when linked list nodes transform into a Red-Black Tree.",
-      "What is the difference between `Fail-Fast` and `Fail-Safe` iterators in Java? What causes a `ConcurrentModificationException`, and how do you safely remove elements during collection iteration?",
-      "Explain the difference between `synchronized` method/block, `volatile` keyword, and `AtomicInteger`. Does `volatile` guarantee atomicity? Why or why not?",
-      "In Java 8 Stream API: What is the difference between intermediate and terminal operations? Walk me through when you would use `map()` vs `flatMap()` with a practical example.",
+      "Why is String immutable in Java, and when would you use StringBuilder instead of StringBuffer?",
+      "What is the contract between equals() and hashCode() in Java, and what happens if you override one without the other?",
+      "How does HashMap work internally in Java, and how does it handle hash collisions?",
+      "What is the difference between fail-fast and fail-safe iterators in Java?",
+      "What is the difference between synchronized, volatile, and AtomicInteger in Java concurrency?",
+      "In Java 8 Streams, what is the difference between map() and flatMap()?",
     ],
     coreMechanics: [
       "Virtual Threads (Project Loom) vs reactive WebFlux: carrier thread pinning on synchronized blocks",
@@ -67,24 +76,24 @@ export const LANGUAGE_TR_KNOWLEDGE = {
       "Concurrency primitives: AtomicReference, ReentrantReadWriteLock, and CompletableFuture pipelines",
     ],
     debuggingScenarios: [
-      "In a Java 21 Spring Boot service, CPU spikes to 100% and response latency jumps from 25ms to 4.5 seconds. Walk me through your diagnostic process: how do you collect thread dumps (jcmd / jstack) to detect thread contention or carrier thread pinning, and how do you analyze heap dumps with Eclipse MAT to identify memory leaks?",
-      "Your Spring Boot backend uses HikariCP and throws `SQLTransientConnectionException: Connection is not available, request timed out after 30000ms`. How do you determine whether the root cause is slow unindexed database queries, long-running `@Transactional` methods holding connections open, or database deadlocks?",
-      "A high-throughput Java microservice experiences sudden 6-second Stop-The-World GC pauses under heavy load. How do you inspect GC logs (`-Xlog:gc*`), evaluate object allocation rates, and configure G1GC or ZGC flags to eliminate the pauses without wasting RAM?",
+      "If a Java Spring Boot service suddenly spikes to 100% CPU and latency jumps, how would you diagnose and fix the issue?",
+      "If your application throws a database connection timeout error, how do you find out what is holding open or exhausting the connections?",
+      "If a Java service experiences long Garbage Collection pauses under load, what steps do you take to reduce memory churn?",
     ],
     architectureQuestions: [
-      "When designing a distributed event-processing service in Java, how do you handle transactional outbox patterns with Spring Data and Kafka to guarantee at-least-once message delivery without distributed two-phase commit (2PC)?",
-      "How do you design multi-tenant data isolation in Spring Boot? Compare schema-per-tenant, database-per-tenant, and shared-schema with Hibernate row-level filters in terms of connection pool efficiency and regulatory compliance.",
+      "How do you ensure reliable message delivery between Spring Boot microservices when using Kafka or RabbitMQ?",
+      "How do you manage database transactions across multiple microservices without running into data inconsistencies?",
     ],
   },
   Python: {
     name: "Python",
     mostlyExpectedInterviewQuestions: [
-      "What is the difference between mutable and immutable data types in Python? How does Python's 'pass-by-object-reference' (call-by-assignment) mechanism handle function arguments when modifying lists versus integers?",
-      "What is Python's Global Interpreter Lock (GIL)? Why was it designed into CPython, how does it affect multi-threaded CPU-bound programs, and what are the standard ways to achieve true parallelism?",
-      "Explain Python's memory management: How do reference counting and cyclic garbage collection collaborate, and what is the difference between `is` and `==`?",
-      "How do Python Decorators work under the hood? Walk me through how you would implement a custom decorator that measures execution time and caches function results (memoization).",
-      "What is the difference between a shallow copy and a deep copy in Python? Demonstrate a scenario where `copy.copy()` leads to unintended side-effects on nested mutable collections.",
-      "How do Python Generators and the `yield` statement work compared to standard functions returning lists? What is the iterator protocol (`__iter__` and `__next__`)?",
+      "What is the difference between mutable and immutable data types in Python, and how does that affect function arguments?",
+      "What is Python's Global Interpreter Lock (GIL), and how does it impact multi-threaded programs?",
+      "How does memory management and garbage collection work in Python, and what is the difference between 'is' and '=='?",
+      "How do Python decorators work, and how would you write a simple decorator to measure execution time?",
+      "What is the difference between a shallow copy and a deep copy in Python?",
+      "How do generators and the yield keyword work in Python compared to returning a regular list?",
     ],
     coreMechanics: [
       "CPython Global Interpreter Lock (GIL) and its effect on CPU-bound vs I/O-bound concurrency",
@@ -95,23 +104,23 @@ export const LANGUAGE_TR_KNOWLEDGE = {
       "Multiprocessing vs Celery distributed workers for background compute workloads",
     ],
     debuggingScenarios: [
-      "In a high-concurrency FastAPI service, worker memory climbs steadily until Kubernetes OOMKills the pod every 4 hours. How do you isolate whether the leak stems from circular references, unclosed database connection sessions, or module-level global variables using `tracemalloc` or `objgraph`?",
-      "Your Python microservice is experiencing high CPU utilization, but increasing worker threads does not improve throughput. How does CPython's GIL explain this bottleneck, and how would you transition CPU-intensive routines to multiprocessing, Cython, or Rust FFI extensions?",
-      "In an asynchronous Python service using `asyncio` and `httpx`, intermittent request timeouts occur during peak hours. How do you detect if a third-party library is executing synchronous blocking I/O on the main event loop, and how do you wrap it safely using `asyncio.to_thread`?",
+      "If a Python web service steadily consumes memory until it runs out of memory, how do you track down and fix the leak?",
+      "If adding more threads to a CPU-heavy Python script does not improve speed, why is that and how would you fix it?",
+      "In an async Python service, how do you prevent blocking calls from freezing the main event loop?",
     ],
     architectureQuestions: [
-      "When architecting a production Python backend, under what workload characteristics would you choose FastAPI with async SQLAlchemy over Django with traditional synchronous ORM?",
-      "How do you implement graceful shutdown in Python distributed workers (e.g. Celery or custom async consumers) to ensure in-flight messages are acknowledged or requeued cleanly before container termination?",
+      "When would you choose FastAPI over Django for building a backend service?",
+      "How do you implement graceful shutdown in Python background workers so in-flight tasks finish cleanly?",
     ],
   },
   TypeScript: {
     name: "TypeScript / JavaScript",
     mostlyExpectedInterviewQuestions: [
-      "What is the difference between an `interface` and a `type` alias in TypeScript? When would you strictly prefer one over the other (e.g. declaration merging vs union types)?",
-      "Explain the differences between `any`, `unknown`, `never`, and `void` in TypeScript. Why is `unknown` considered a type-safe alternative to `any`?",
-      "How do Type Guards and Type Narrowing work in TypeScript? Walk me through using `typeof`, `instanceof`, `in`, and custom user-defined type predicates (`val is Type`).",
-      "Explain Generics in TypeScript: How do you enforce generic constraints using `extends`, and how does `keyof` work in mapped object lookups?",
-      "How do utility types like `Partial<T>`, `Required<T>`, `Pick<T, K>`, and `Omit<T, K>` work, and how does TypeScript ensure compile-time immutability with `Readonly<T>`?",
+      "What is the difference between an interface and a type alias in TypeScript?",
+      "Explain the differences between any, unknown, and never in TypeScript.",
+      "How do type guards and type narrowing work in TypeScript?",
+      "How do generics work in TypeScript, and how do you enforce constraints with extends?",
+      "How do utility types like Partial, Pick, and Omit help in writing clean TypeScript code?",
     ],
     coreMechanics: [
       "V8 engine internals: hidden classes, inline caching, and JIT deoptimizations",
@@ -122,9 +131,9 @@ export const LANGUAGE_TR_KNOWLEDGE = {
       "End-to-end type safety: tRPC, Zod schema validation, and OpenAPI code generation",
     ],
     debuggingScenarios: [
-      "In a Node.js production service, event loop lag spikes above 900ms, causing reverse proxies to return 504 Gateway Timeouts. Walk me through your diagnostic approach: how do you capture clinic.js or V8 CPU profiles to identify whether the culprit is synchronous JSON parsing, unindexed regular expressions, or cryptographic hashing?",
-      "In a complex React single-page application, users experience noticeable input lag when typing into a search field attached to a large data grid. How do you profile component re-renders using React DevTools, and how do you combine virtualization and `useDeferredValue` to keep the UI fluid?",
-      "A Node.js microservice leaks memory over 48 hours until heap exhaustion. How do you inspect V8 heap snapshots in Chrome DevTools to locate detached DOM/objects, dangling event listeners, or growing Map instances?",
+      "If a Node.js API experiences high event loop lag and request timeouts, how would you diagnose and fix the bottleneck?",
+      "In a React application, if a search input feels laggy when typing, how do you identify and fix unnecessary re-renders?",
+      "How do you track down and fix a memory leak in a Node.js backend?",
     ],
     architectureQuestions: [
       "How do you architect a enterprise TypeScript monorepo across frontend and backend boundaries to guarantee 100% compile-time type safety while preventing accidental backend code leakage into the client bundle?",
@@ -134,12 +143,12 @@ export const LANGUAGE_TR_KNOWLEDGE = {
   JavaScript: {
     name: "JavaScript / Node.js",
     mostlyExpectedInterviewQuestions: [
-      "What are the fundamental differences between `var`, `let`, and `const`? Explain variable hoisting, the Temporal Dead Zone (TDZ), and function vs block scoping.",
-      "What is a Closure in JavaScript? Walk me through a concrete scenario where you used closures for data privacy (private state) or function currying.",
-      "Explain the `this` keyword binding rules in JavaScript: default, implicit, explicit (`call`, `apply`, `bind`), and how arrow functions differ in their lexical `this` binding.",
-      "Walk me through the JavaScript Event Loop: How does V8 handle synchronous code on the call stack, microtasks (Promises, queueMicrotask), and macrotasks (`setTimeout`, I/O)? Which takes priority?",
-      "What is Prototypal Inheritance in JavaScript? How does the prototype chain work, and how does it differ from traditional classical inheritance found in Java or C++?",
-      "What is the difference between Debouncing and Throttling? In what real-world frontend scenarios (e.g. search autocomplete vs window scroll/resize) would you choose one over the other?",
+      "What are the fundamental differences between var, let, and const in JavaScript?",
+      "What is a closure in JavaScript, and what is a practical example of where you would use one?",
+      "How does the 'this' keyword work in JavaScript, and how do arrow functions handle 'this' differently?",
+      "Can you briefly explain how the JavaScript Event Loop handles promises compared to setTimeout?",
+      "How does prototypal inheritance work in JavaScript?",
+      "What is the difference between debouncing and throttling, and when would you use each?",
     ],
     coreMechanics: [
       "Prototypal inheritance, closures, and lexical scoping",
@@ -158,11 +167,11 @@ export const LANGUAGE_TR_KNOWLEDGE = {
   Go: {
     name: "Go (Golang)",
     mostlyExpectedInterviewQuestions: [
-      "How do Goroutines differ from OS threads in terms of memory stack allocation, creation overhead, and scheduling?",
-      "Explain the difference between Buffered and Unbuffered Channels in Go. What happens when you read from or write to a closed channel, or a nil channel?",
-      "How do Slices work internally in Go? Explain the relationship between the slice pointer, length, and capacity, and describe what happens when `append()` exceeds capacity.",
-      "Explain Interfaces in Go: Why is interface implementation called implicit (duck typing), and what is the internal memory representation of an `iface` and `eface`?",
-      "What are the rules for using `defer`, `panic`, and `recover` in Go? In what order do deferred functions execute, and how do you recover from a panic?",
+      "How do Goroutines differ from standard OS threads in Go?",
+      "What is the difference between buffered and unbuffered channels in Go?",
+      "How do slices work internally in Go, and what happens when append() exceeds capacity?",
+      "How do interfaces work in Go, and why are they implemented implicitly?",
+      "How do defer, panic, and recover work in Go for error handling and cleanup?",
     ],
     coreMechanics: [
       "Go runtime M:N scheduler: goroutines, OS threads, logical processors (G, M, P) and work stealing",
@@ -173,9 +182,9 @@ export const LANGUAGE_TR_KNOWLEDGE = {
       "Profiling: `pprof` for CPU, heap, goroutine, and block contention profiling",
     ],
     debuggingScenarios: [
-      "In a Go microservice, the active goroutine count climbs steadily from 300 to 85,000 over 72 hours until the pod runs out of memory. How do you use `net/http/pprof` to inspect the goroutine profile, and what patterns typically cause goroutines to leak indefinitely?",
-      "You run `go test -race` in CI and discover a data race between concurrent map reads and writes. How do you resolve this race without introducing heavy lock contention across high-throughput endpoints?",
-      "Under heavy production load, a Go network service starts dropping connections. How do you determine whether the bottleneck is channel buffer contention, GC pauses, or file descriptor limits?",
+      "If the active goroutine count in your Go service keeps climbing over time, how do you find and fix the leak?",
+      "How do you use 'go test -race' to detect and resolve data races in concurrent Go code?",
+      "If your Go service starts dropping requests under load, what are the first metrics you inspect?",
     ],
     architectureQuestions: [
       "How do you structure Go packages to adhere to Clean Architecture principles while strictly avoiding cyclic dependencies? Why is idiomatic Go inclined toward interfaces at the consumer site?",
@@ -185,11 +194,11 @@ export const LANGUAGE_TR_KNOWLEDGE = {
   "C++": {
     name: "C++",
     mostlyExpectedInterviewQuestions: [
-      "What are Virtual Functions and Pure Virtual Functions in C++? Walk me through how the Virtual Method Table (`vtable`) and virtual pointer (`vptr`) execute dynamic polymorphism at runtime.",
-      "Explain Smart Pointers in Modern C++ (`std::unique_ptr`, `std::shared_ptr`, `std::weak_ptr`). How does atomic reference counting work in `shared_ptr`, and how does `weak_ptr` resolve cyclic retain leaks?",
-      "What are Move Semantics and Rvalue References (`&&`) in C++11? How does `std::move` enable resource transfer without deep copying, and what is the Rule of 5?",
-      "What is the difference between stack and heap memory allocation in C++? Compare `new`/`delete` with `malloc`/`free`, specifically regarding constructor/destructor execution.",
-      "Explain Const Correctness in C++: What is the difference between `const int* p`, `int* const p`, and `const int* const p`? What does declaring a member function `const` guarantee?",
+      "What is the difference between virtual functions and pure virtual functions in C++?",
+      "What is the difference between std::unique_ptr and std::shared_ptr, and when should you use each?",
+      "What are move semantics and rvalue references in modern C++, and why are they useful?",
+      "What is the difference between stack and heap memory allocation in C++?",
+      "Explain const correctness in C++ and what declaring a member function const guarantees.",
     ],
     coreMechanics: [
       "RAII (Resource Acquisition Is Initialization) and exception safety guarantees",
@@ -200,9 +209,9 @@ export const LANGUAGE_TR_KNOWLEDGE = {
       "Concurrency: `std::atomic`, memory orderings (`acquire-release`, `relaxed`, `seq_cst`), and lock-free data structures",
     ],
     debuggingScenarios: [
-      "In a multithreaded C++ service, you encounter an intermittent segmentation fault that only reproduces under production load. Walk me through your triage: how do you use GDB core dump analysis, AddressSanitizer (ASan), and Valgrind to locate the use-after-free or race condition?",
+      "How do you debug an intermittent segmentation fault in C++ using tools like GDB or Valgrind?",
       "A high-frequency C++ application experiences tail latency spikes. How do you analyze CPU cache misses using `perf` and restructure data layouts from Array-of-Structures (AoS) to Structure-of-Arrays (SoA) to maximize cache locality?",
-      "How do you identify and mitigate memory fragmentation in long-running C++ applications without restarting the process?",
+      "How do you detect and fix memory leaks or dangling pointers in a C++ application?",
     ],
     architectureQuestions: [
       "How would you design a lock-free Single Producer Single Consumer (SPSC) ring buffer in C++ using `std::atomic` and appropriate memory ordering?",
@@ -212,12 +221,12 @@ export const LANGUAGE_TR_KNOWLEDGE = {
   SQL: {
     name: "SQL & Databases (PostgreSQL / MySQL / Redis)",
     mostlyExpectedInterviewQuestions: [
-      "What is the difference between a Clustered Index and a Non-Clustered Index? How does the B-Tree leaf node store data in each case?",
-      "Explain the differences between `INNER JOIN`, `LEFT OUTER JOIN`, `RIGHT OUTER JOIN`, and `FULL OUTER JOIN`. Write a query to find employees who do not belong to any department.",
-      "What is the difference between the `WHERE` clause and the `HAVING` clause in SQL? Why can't aggregate functions like `COUNT()` or `SUM()` be used in `WHERE`?",
-      "Explain ACID properties in relational databases. What does each property guarantee during concurrent transactions?",
-      "How do SQL Window Functions work? What is the difference between `ROW_NUMBER()`, `RANK()`, and `DENSE_RANK()` when handling duplicate values?",
-      "Write a SQL query to find the N-th highest salary from an Employee table using both `DENSE_RANK()` and a subquery/LIMIT offset.",
+      "What is the difference between a clustered index and a non-clustered index?",
+      "What is the difference between an INNER JOIN and a LEFT JOIN in SQL, and when would you use each?",
+      "What is the difference between the WHERE clause and the HAVING clause in SQL?",
+      "Can you explain the ACID properties of a relational database in simple terms?",
+      "In SQL window functions, what is the difference between ROW_NUMBER(), RANK(), and DENSE_RANK()?",
+      "How would you write a query to find the second-highest salary from an employees table?",
     ],
     coreMechanics: [
       "Indexing internals: B-Tree vs Hash vs GIN vs LSM-tree, and composite index column ordering",
@@ -227,20 +236,20 @@ export const LANGUAGE_TR_KNOWLEDGE = {
       "Distributed caching: Cache-Aside, Write-Through, cache stampede (thundering herd), and Redis eviction policies",
     ],
     debuggingScenarios: [
-      "A mission-critical SQL query running against a 25-million row table suddenly degrades from 12ms to 18 seconds during peak traffic. Walk me through how you interpret `EXPLAIN (ANALYZE, BUFFERS)`: what do sequential scans, high disk read buffers, and external sort spills reveal?",
-      "Your PostgreSQL database experiences frequent `deadlock detected` errors during high-concurrency order placements. How do you inspect `pg_stat_activity` and lock trees, and how do you rewrite transactions to enforce consistent lock acquisition ordering?",
-      "Your Redis cache cluster CPU hits 100% and latency spikes. How do you diagnose whether the issue is caused by O(N) commands like `KEYS *`, hot keys, or memory eviction thrashing under high write volume?",
+      "If a database query suddenly becomes very slow on a large table, how would you optimize it using EXPLAIN?",
+      "How do you detect and resolve database deadlocks occurring during concurrent transactions?",
+      "If your Redis cache hits 100% CPU and slows down, what are the first things you check?",
     ],
     architectureQuestions: [
-      "Compare PostgreSQL and MongoDB for an e-commerce transactional system: what are the specific trade-offs regarding ACID guarantees, secondary indexing, and schema evolution?",
-      "How do you architect a multi-layer caching system (local in-memory cache + distributed Redis) while ensuring cache stampede mitigation and eventual consistency upon database updates?",
+      "When would you choose PostgreSQL over MongoDB for storing application data?",
+      "How do you implement caching with Redis to speed up database queries without returning stale data?",
     ],
   },
   Rust: {
     name: "Rust",
     mostlyExpectedInterviewQuestions: [
       "Explain the 3 core rules of Ownership and Borrowing in Rust. What is the principle of 'Aliasing XOR Mutability'?",
-      "What is the difference between `String` and `&str` in Rust? Where are they stored in memory, and how do string slices work?",
+      "What is the difference between String and `&str` in Rust? Where are they stored in memory, and how do string slices work?",
       "How does error handling work in Rust using `Result<T, E>` and `Option<T>`? Explain pattern matching with `match` and the `?` error propagation operator.",
       "What are Traits in Rust? Compare static dispatch via generics (monomorphization) with dynamic dispatch via trait objects (`dyn Trait`).",
       "Explain `Send` and `Sync` marker traits in Rust concurrency. How do `Arc<T>` and `Mutex<T>` work together to share mutable state safely between threads?",
@@ -286,11 +295,11 @@ export const LANGUAGE_TR_KNOWLEDGE = {
   C: {
     name: "C (Systems & Embedded)",
     mostlyExpectedInterviewQuestions: [
-      "Explain Pointer Arithmetic and Double Pointers (`char**`) in C. How does indexing `arr[i]` translate into pointer offsets at the compiler level?",
-      "Compare `malloc`, `calloc`, `realloc`, and `free`. What is a Dangling Pointer, what is a Memory Leak, and how do you prevent them in production C code?",
-      "What is the difference between a `struct` and a `union` in C in terms of memory allocation, member alignment, and size calculation?",
-      "Explain the difference between `static` local variables, `static` global variables, and `extern` variables in terms of scope and memory lifetime.",
-      "What causes Buffer Overflow in C, and why are functions like `gets()` or `strcpy()` considered dangerous compared to `fgets()` or `snprintf()`?",
+      "How does pointer arithmetic and double pointers work in C?",
+      "What is the difference between malloc, calloc, and free, and what is a dangling pointer?",
+      "What is the difference between a struct and a union in C?",
+      "What is the difference between static and extern variables in C?",
+      "What causes buffer overflows in C, and how do you write safe string operations?",
     ],
     coreMechanics: [
       "Manual heap memory management: malloc, calloc, realloc, free, and arena allocators",
@@ -502,37 +511,52 @@ export const LANGUAGE_HR_KNOWLEDGE = {
     {
       topic: "Production Outage Ownership",
       question: (lang) =>
-        `Using the **STAR** method (Situation, Task, Action, Result): Describe a high-severity production incident or outage that occurred in your ${lang ? `**${lang}** ` : ""}service. How did you immediately triage the issue under pressure, communicate the impact to non-technical leadership and customers, and run the blameless post-mortem?`,
+        cleanAsterisks(`Can you describe a time a critical bug or outage occurred in your ${lang ? `${lang} ` : ""}application? What immediate steps did you take, and how did you resolve it?`),
       sampleAnswer: (lang) =>
-        `Situation: In our ${lang || "core"} payment service, a sudden traffic spike exhausted database connections, causing 504 errors on 8% of transactions.\nTask: As the on-call engineer, I had to restore transaction flow, communicate with leadership, and prevent financial loss.\nAction: I declared a P0 incident, posted updates in our stakeholder incident channel every 10 minutes, rolled back the latest migration, increased connection limits temporarily, and enabled request shedder.\nResult: Restored full operations in 14 minutes, authored a blameless post-mortem identifying missing connection timeouts, and added automated load-testing in CI.`,
+        `Situation: In our payment service, a traffic spike caused connection pool exhaustion and errors.
+Task: As the on-call engineer, I had to restore traffic and prevent transaction failures.
+Action: I declared an incident, temporarily increased connection limits, enabled request throttling, and rolled back a problematic change.
+Result: Restored full operations in 15 minutes and added connection pool monitoring to prevent recurrence.`,
     },
     {
       topic: "Technical Disagreement & Consensus",
       question: (lang) =>
-        `Tell me about a situation where you had a significant technical disagreement with a teammate or senior architect regarding ${lang ? `**${lang}** architectural decisions ` : "technology choices "}or library selection. How did you handle the discussion, what benchmark data or prototypes did you use to build consensus, and what was the outcome?`,
+        cleanAsterisks(`Tell me about a time you had a technical disagreement with a teammate or architect regarding ${lang ? `${lang} ` : ""}design choices. How did you discuss options and reach an agreement?`),
       sampleAnswer: (lang) =>
-        `Situation: Our team was divided on whether to adopt a new ${lang || "modern"} framework or stick with our existing legacy stack.\nTask: We needed to resolve the debate without creating friction or stalling sprint delivery.\nAction: Rather than arguing opinions, I organized a 2-day spike. We defined objective criteria: developer velocity, latency benchmarks, and operational complexity. We built identical prototypes and presented the empirical data to the team.\nResult: The data clearly highlighted the new approach reduced latency by 35%, leading to unanimous team consensus and successful rollout.`,
+        `Situation: Our team was divided between adopting a new library or sticking with our existing approach.
+Task: Resolve the disagreement without causing friction or delaying delivery.
+Action: I built two small benchmark prototypes to compare latency and developer ergonomics objectively with empirical data.
+Result: The data showed a 30% performance boost with the new approach, leading to team consensus and successful rollout.`,
     },
     {
       topic: "Code Reviews & Engineering Standards",
       question: (lang) =>
-        `In code reviews, how do you handle a situation where a junior or peer developer submits ${lang ? `**${lang}** ` : ""}code that works functionally, but violates performance best practices, readability, or architectural patterns? Walk me through how you phrase your feedback to mentor them without discouraging their initiative.`,
+        cleanAsterisks(`In code reviews, how do you give feedback to a teammate when their ${lang ? `${lang} ` : ""}code works but could be cleaner or more efficient?`),
       sampleAnswer: (lang) =>
-        `Situation: A teammate submitted a ${lang || ""} PR that passed unit tests but used an $O(N^2)$ nested loop in a critical path that would degrade in production.\nTask: Guide the developer to refactor the implementation while building their technical intuition.\nAction: I left an empathetic, constructive comment: 'This logic works great for small batches! However, when data volume reaches 50k items, this loop might cause latency spikes. What do you think about using a hash map lookup here to bring it to $O(N)$? Happy to jump on a 5-min huddle to pair.'\nResult: The developer embraced the suggestion, we refactored the code together, and they subsequently documented the pattern in our team engineering playbook.`,
+        `Situation: A teammate submitted code that passed tests but had an O(N^2) loop that would slow down on large data.
+Task: Guide them constructively to optimize the logic.
+Action: I left a positive, helpful comment explaining the performance consideration and suggesting a hash map approach, offering to pair on it.
+Result: The developer appreciated the feedback, updated the logic to O(N), and applied the pattern in future work.`,
     },
     {
       topic: "Technical Debt vs. Feature Velocity",
       question: (lang) =>
-        `Product managers and business stakeholders often push for aggressive deadlines that tempt teams to cut corners. Describe a time you had to push back on a deadline to protect ${lang ? `**${lang}** code quality, security, or stability` : "system stability and test coverage"}. How did you translate technical risk into business terms they understood?`,
+        cleanAsterisks(`Describe a time you had to push back on an aggressive deadline to protect code quality, security, or stability. How did you explain this to stakeholders?`),
       sampleAnswer: (lang) =>
-        `Situation: Product leadership requested launching a ${lang || "backend"} checkout feature 2 weeks ahead of schedule by skipping automated integration tests.\nTask: Convince stakeholders that launching without verification risked customer data corruption and revenue loss.\nAction: Instead of saying 'the code isn't clean', I quantified the risk in business terms: 'Skipping integration tests exposes us to an estimated 5-10% transaction failure rate during launch, which could cost $50,000 in lost sales and reputational damage. If we phase the launch to a 10% canary group next week, we can hit milestones safely.'\nResult: Leadership agreed with the canary compromise, we deployed with 0 data regressions, and the feature was delivered securely.`,
+        `Situation: Leadership wanted to launch a checkout feature early by skipping end-to-end tests.
+Task: Protect system stability while being mindful of business goals.
+Action: I explained the business risk in terms of customer transaction failures and proposed a phased rollout with 10% traffic first.
+Result: Leadership agreed with the phased approach, ensuring zero customer downtime.`,
     },
     {
       topic: "Mentoring & Knowledge Sharing",
       question: (lang) =>
-        `Describe a time you helped elevate your team's engineering capability or onboarded new teammates in ${lang ? `**${lang}** best practices` : "core technologies"}. What documentation, pairing sessions, or architectural guidelines did you introduce, and how did you measure success?`,
+        cleanAsterisks(`Tell me about a time you mentored a teammate or helped onboard new engineers. What approaches worked best?`),
       sampleAnswer: (lang) =>
-        `Situation: As our team expanded, new engineers were struggling with our distributed architecture and ${lang || "backend"} conventions, leading to lengthy PR review cycles.\nTask: Reduce onboarding ramp-up time and standardize coding conventions.\nAction: I authored a comprehensive 'Zero-to-Hero' onboarding guide, set up local containerized dev environments with 1-click start, and initiated bi-weekly architecture walkthroughs.\nResult: Average onboarding time to first production PR dropped from 3 weeks to 6 days, and PR review comments on standard idioms decreased by 40%.`,
+        `Situation: New engineers were taking several weeks to get comfortable with our microservice architecture.
+Task: Shorten the ramp-up time for new hires.
+Action: I created a quickstart guide, set up local containerized dev environments, and paired with them on their first tasks.
+Result: Onboarding time dropped from 3 weeks to under 1 week, and new teammates contributed production PRs faster.`,
     },
   ],
 };
@@ -591,12 +615,12 @@ export function generateDynamicQuestion(
   ) {
     const topSkills = inventory.skills.slice(0, 4).join(", ") || inventory.languages.join(", ");
     const archVariants = [
-      `As a **${role}**, how do you architect a high-throughput, fault-tolerant service using **${topSkills}** that handles 50,000 requests/sec with p99 latency < 20ms? Walk me through your service boundaries, connection pooling, and how you mitigate single points of failure (SPOF).`,
-      `In designing a distributed backend with **${topSkills}**: How do you approach data consistency across distributed boundaries? When would you choose an asynchronous event-driven architecture with Kafka/RabbitMQ versus synchronous gRPC/REST APIs, and how do you implement the transactional outbox pattern?`,
-      `Suppose your primary service running **${topSkills}** experiences sudden cascading failures due to downstream database degradation. Walk me through your resilience strategy: How do you configure circuit breakers, rate limiters, request shedding, and automated health checks to prevent total cluster collapse?`,
-      `When scaling systems for **${role}** workloads: How do you balance vertical vs horizontal scaling trade-offs, and what caching strategies (Cache-Aside, Write-Through, Redis distributed cache) do you implement to protect database throughput?`,
+      `As a ${role}, how would you design a scalable service using ${topSkills} to handle high traffic reliably?`,
+      `When designing a distributed backend with ${topSkills}, how do you ensure data consistency between services?`,
+      `If a downstream database slows down in your ${topSkills} service, what strategies would you use to keep the system responsive?`,
+      `How do you decide between caching data in Redis versus querying the database directly?`,
     ];
-    return archVariants[seedIndex % archVariants.length];
+    return cleanAsterisks(archVariants[seedIndex % archVariants.length]);
   }
 
   // 2. SPECIFIC PROJECT DEEP-DIVE DIRECTLY FROM RESUME
@@ -605,13 +629,13 @@ export function generateDynamicQuestion(
     const projTech = competency.projectTech || "the core stack";
 
     const projectVariants = [
-      `Looking at your resume project **${projName}** (${projTech}): Suppose traffic surges 20x during a peak event, causing database connection pool exhaustion and API 504 timeouts. Walk me through how you would diagnose the bottleneck in your architecture and what caching or queuing mechanisms you would introduce.`,
-      `Regarding your project **${projName}**: What was the most critical single point of failure (SPOF) or outage risk in this system? What observability metrics (telemetry, p99 latency, distributed tracing) did you instrument to detect anomalies before users reported them?`,
-      `On **${projName}**, you utilized **${projTech}**. Looking back at the technical decisions you made, what is one architectural compromise you made to hit deadlines, and how would you redesign it today for 100x scalability?`,
-      `In your project **${projName}**, how did you guarantee data consistency and handle partial network failures when communicating between distributed services or updating database state?`,
+      `Looking at your project ${projName}: If user traffic suddenly jumps 10x, where would you expect bottlenecks, and how would you optimize them?`,
+      `In your project ${projName}, what was the most challenging technical decision you had to make, and what trade-offs did you consider?`,
+      `How did you handle error handling and service failures in ${projName}?`,
+      `If you had to redesign ${projName} today for higher scale, what would you change in the architecture?`,
     ];
 
-    return projectVariants[variantIndex % projectVariants.length];
+    return cleanAsterisks(projectVariants[variantIndex % projectVariants.length]);
   }
 
   // 3. HR BEHAVIORAL GROUNDED IN RESUME / STACK
@@ -627,16 +651,16 @@ export function generateDynamicQuestion(
     const hrQuestions = LANGUAGE_HR_KNOWLEDGE.general || [];
     const hrItem = hrQuestions[seedIndex % hrQuestions.length];
     if (hrItem) {
-      return hrItem.question(lang);
+      return cleanAsterisks(hrItem.question(lang));
     }
-    const topProjName = inventory.projects[0]?.name ? `your work on **${inventory.projects[0].name}**` : `your role as a ${role}`;
+    const topProjName = inventory.projects[0]?.name ? `your work on ${inventory.projects[0].name}` : `your role as a ${role}`;
     const hrVariants = [
-      `Using the **STAR** method (Situation, Task, Action, Result): In ${topProjName}${lang ? ` working with **${lang}**` : ""}, describe a time a critical bug or production regression slipped into production. How did you immediately contain the issue, communicate with non-technical stakeholders, and lead the blameless post-mortem?`,
-      `Tell me about a situation in your engineering career as a ${role} where you had a significant technical disagreement with a teammate or senior architect regarding ${lang ? `**${lang}** architecture` : "technology choices"}. How did you handle the debate, what benchmarks or prototypes did you use to evaluate options, and what was the outcome?`,
-      `In code reviews, how do you handle a situation where a teammate submits ${lang ? `**${lang}** ` : ""}code that functions but violates performance best practices or architecture patterns? How do you mentor them without causing friction?`,
-      `Product managers often push for tight deadlines that tempt teams to cut corners. Describe a time you pushed back on a deadline to protect code quality and system reliability. How did you translate technical risk into business terms?`,
+      `Can you describe a time a critical bug or outage occurred in your application? How did you resolve it and prevent it from happening again?`,
+      `Tell me about a time you had a technical disagreement with a team member. How did you approach the discussion and reach an agreement?`,
+      `During code reviews, how do you provide constructive feedback to a teammate whose code works but could be improved?`,
+      `Have you ever had to push back on an aggressive deadline to ensure code quality or stability? How did you handle that conversation?`,
     ];
-    return hrVariants[seedIndex % hrVariants.length];
+    return cleanAsterisks(hrVariants[seedIndex % hrVariants.length]);
   }
 
   // 4. SPECIFIC LANGUAGE SKILL FROM RESUME OR COMPETENCY (TR)
@@ -776,7 +800,7 @@ export function generateDynamicQuestion(
   const coreConcept =
     langData.coreMechanics[Math.abs(sessionSeed * 13) % langData.coreMechanics.length];
 
-  return `In ${scenario.context} built with **${primaryLang}**, handling **${scenario.scale}** with **${scenario.latency}**: Suppose the system experiences **${scenario.failure}**.\n\nWalk me through your engineering diagnosis: How does **${coreConcept}** impact this bottleneck, what low-level telemetry would you inspect, and what concrete architectural or code-level changes would you implement to guarantee resilience?`;
+  return cleanAsterisks(`In a ${scenario.context} built with ${primaryLang}: Suppose the system encounters ${scenario.failure}. How would you diagnose the root cause and resolve it?`);
 }
 
 /**
@@ -1041,10 +1065,13 @@ export function generateConversationalOpening(profile, selectedLanguages = [], r
 
   if (hasResume && inventory.projects.length > 0) {
     const topProj = inventory.projects[0];
-    const topSkills = inventory.skills.slice(0, 4).join(", ") || "your tech stack";
-    const projTech = typeof topProj.technologies === "string" ? topProj.technologies : "your stack";
+    const topSkills = inventory.skills.slice(0, 3).join(", ") || "your tech stack";
 
-    return `Hello ${name}! Welcome to your technical mock interview for the **${role}** position.\n\nI've analyzed your resume and noted your experience with **${topSkills}**, including your work on **${topProj.name}** (${projTech}).\n\nTo begin: Walk me through the high-level architecture of **${topProj.name}**: what were the core system components, why did you select ${projTech} over alternatives, and what was the most critical failure mode or bottleneck you had to solve?`;
+    return cleanAsterisks(`Hello ${name}! Welcome to your mock interview for the ${role} position.
+
+I noticed your experience with ${topSkills} and your project ${topProj.name}.
+
+To begin: Can you give a quick overview of ${topProj.name} and the main technical challenge you solved?`);
   }
 
   const activeLangs =
@@ -1057,22 +1084,34 @@ export function generateConversationalOpening(profile, selectedLanguages = [], r
   const langString = activeLangs.join(", ");
   const roundDesc =
     roundType === "hr"
-      ? "Behavioral & Cultural Leadership (HR)"
+      ? "Behavioral and Leadership"
       : roundType === "tr"
-      ? "Technical Deep-Dive (TR)"
-      : "Technical Review (TR) and Behavioral Leadership (HR)";
+      ? "Technical"
+      : "Technical and Behavioral";
 
   const firstLang = activeLangs[0] || "Java";
 
   if (roundType === "hr") {
-    return `Hello ${name}! Welcome to your **${roundDesc}** interview for the **${role}** position.\n\nToday, we will evaluate your situational judgment, production ownership, communication, and team leadership across your primary stack: **${langString}**.\n\nTo begin: Describe a time you faced a high-severity production outage or critical bug in a ${firstLang} service. How did you coordinate the incident response under pressure, communicate with stakeholders, and run the blameless post-mortem?`;
+    return cleanAsterisks(`Hello ${name}! Welcome to your ${roundDesc} mock interview for the ${role} position.
+
+We will discuss your teamwork, problem solving, and past experiences.
+
+To begin: Can you tell me about a time you handled a critical bug or production issue under pressure?`);
   }
 
   if (roundType === "tr") {
-    return `Hello ${name}! Welcome to your **${roundDesc}** for the **${role}** position.\n\nWe will examine system design, concurrency, memory profiling, and real-world debugging centered on your chosen languages: **${langString}**.\n\nTo kick off: In a production ${firstLang} service processing 50,000 requests/sec with p99 latency < 20ms, what are the primary concurrency bottlenecks you anticipate, and how do you configure connection pools and thread safety to prevent thread starvation or deadlocks?`;
+    return cleanAsterisks(`Hello ${name}! Welcome to your ${roundDesc} mock interview for the ${role} position.
+
+We will focus on practical problem solving in ${langString}.
+
+Let's start with ${firstLang}: How does memory management and garbage collection work in ${firstLang}?`);
   }
 
-  return `Hello ${name}! Welcome to your **${roundDesc}** mock interview for the **${role}** position.\n\nWe will cover both **Technical Depth (TR)** and **Behavioral Leadership (HR)** across your chosen languages: **${langString}**.\n\nLet's start with a technical scenario in **${firstLang}**: Suppose your service experiences a 10x traffic spike causing p99 latency to jump from 15ms to 800ms with connection pool starvation. Walk me through your step-by-step diagnostic workflow: what metrics do you inspect first, and how would you resolve the bottleneck?`;
+  return cleanAsterisks(`Hello ${name}! Welcome to your ${roundDesc} mock interview for the ${role} position.
+
+We will cover both technical skills and behavioral questions across ${langString}.
+
+Let's start with ${firstLang}: If your service suddenly experiences high CPU usage and slow responses, how would you diagnose and fix the issue?`);
 }
 
 /**
@@ -1112,12 +1151,12 @@ export function evaluateAnswerAndGenerateAdaptiveFollowUp(
 
     const probes = isHrRound
       ? [
-          `${quotePrefix}could you elaborate using the **STAR** framework? Specifically, what was the tangible **Result** or stakeholder outcome, and how did your ${primaryLang} engineering leadership influence the resolution?`,
-          `${quotePrefix}how did you communicate the risk to non-technical stakeholders and manage their expectations under deadline pressure?`,
+          cleanAsterisks(`${quotePrefix}Could you share the specific outcome or results of that decision?`),
+          cleanAsterisks(`${quotePrefix}How did you communicate the risk to stakeholders and manage expectations?`),
         ]
       : [
-          `${quotePrefix}let's examine the concrete implementation details in ${primaryLang}:\n\nSpecifically, what were the quantitative trade-offs (latency, memory overhead, or concurrency limits), how did you handle edge cases or failure recovery, and what verification did you run to confirm system stability?`,
-          `${quotePrefix}could you walk me through the operational specifics? Under a sudden 10x surge or unexpected database failover, how would your proposed approach hold up, and what metrics would you monitor in your telemetry dashboard?`,
+          cleanAsterisks(`${quotePrefix}What trade-offs did you consider, and how did you handle potential failure cases in ${primaryLang}?`),
+          cleanAsterisks(`${quotePrefix}If traffic suddenly spiked 10x, where would you expect the biggest bottleneck and how would you monitor it?`),
         ];
 
     return {
