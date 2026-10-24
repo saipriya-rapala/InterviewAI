@@ -1,4 +1,13 @@
-import Editor from "react-simple-code-editor";
+import SimpleEditor from "react-simple-code-editor";
+
+// Support both ESM and CJS bundling where default might be wrapped
+const Editor = (() => {
+  let comp = SimpleEditor;
+  if (comp && comp.default) {
+    comp = comp.default;
+  }
+  return comp;
+})();
 import Prism from "prismjs";
 import "prismjs/components/prism-c";
 import "prismjs/components/prism-cpp";
